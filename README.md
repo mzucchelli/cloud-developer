@@ -1,2 +1,6 @@
 # cloud-developer
-content for Udacity's cloud developer nanodegree
+
+This repo can be cloned from:
+https://github.com/mzucchelli/cloud-developer
+
+
