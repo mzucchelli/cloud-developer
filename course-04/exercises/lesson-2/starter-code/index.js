@@ -18,12 +18,33 @@ exports.handler = async (event) => {
 
   // TODO: Return 400 error if parameters are invalid
 
+  let limit
+  let nextKey
+
+  try {
+    limit = parseLimitParameter(event) || 20
+    nextKey = parseNextKeyParameter(event)
+  }
+  catch (e) {
+    console.log('failed to parse query parameters"', e.message)
+    return {
+      statusCode: 400,
+      headers: {
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify({
+        error: 'Invalid Parameters'
+      })
+    }
+  }
+
+  console.log('groupsTable', groupsTable)
   // Scan operation parameters
   const scanParams = {
     TableName: groupsTable,
     // TODO: Set correct pagination parameters
-    // Limit: ???,
-    // ExclusiveStartKey: ???
+    Limit: limit,
+    ExclusiveStartKey: nextKey
   }
   console.log('Scan params: ', scanParams)
 
@@ -45,6 +66,29 @@ exports.handler = async (event) => {
       nextKey: encodeNextKey(result.LastEvaluatedKey)
     })
   }
+}
+
+function parseLimitParameter(event) {
+  const limitStr = getQueryParameter(event, "limit")
+  if(!limitStr) {
+    return undefined
+  }
+
+ const limit = parseInt(limitStr, 10)
+  if(limit <= 0) {
+    throw new Error("Limit should be positive")
+  }
+
+  return limit
+}
+
+function parseNextKeyParameter(event) {
+  const nextKeyStr = getQueryParameter(event, "nextKey")
+  if(!nextKeyStr) {
+    return undefined
+  }
+
+  return JSON.parse(decodeURIComponent(nextKeyStr))
 }
 
 /**
