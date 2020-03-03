@@ -11,6 +11,7 @@ const auth = new Auth(history)
 const handleAuthentication = (props: any) => {
   const location = props.location
   if (/access_token|id_token|error/.test(location.hash)) {
+    console.log(location);
     auth.handleAuthentication()
   }
 }
