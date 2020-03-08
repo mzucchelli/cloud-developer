@@ -34,7 +34,3 @@ export async function deleteTodo(todoId: string, userId: string) {
 export async function updateTodo(updatedTodo: UpdateTodoRequest, todoId: string, userId: string) {
   return todoAccess.updateTodo(updatedTodo, todoId, userId)
 }
-
-export function generateUploadUrl(todoId: string) {
-  return todoAccess.generateUploadUrl(todoId)
-}

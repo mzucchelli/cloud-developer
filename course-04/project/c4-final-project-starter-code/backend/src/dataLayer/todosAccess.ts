@@ -8,11 +8,8 @@ export class TodoAccess {
     constructor(
         private readonly logger = createLogger('get-todos'),
         private readonly docClient: DocumentClient = new AWS.DynamoDB.DocumentClient(),
-        private readonly s3 = new AWS.S3({ signatureVersion: 'v4' }),
         private readonly todosTable: string = process.env.TODOS_TABLE,
         private readonly indexName: string = process.env.INDEX_NAME,
-        private readonly bucketName = process.env.IMAGES_S3_BUCKET,
-        private readonly urlExpiration = parseInt(process.env.SIGNED_URL_EXPIRATION)
     ) { }
 
     async getAllTodos(userId: string): Promise<TodoItem[]> {
@@ -83,19 +80,5 @@ export class TodoAccess {
         }).promise()
 
         this.logger.info('updated todo', { todoId, userId })
-    }
-
-    generateUploadUrl(todoId: string): string {
-        this.logger.info('generating uploadUrl', { todoId, bucketName: this.bucketName })
-
-        const uploadUrl = this.s3.getSignedUrl('putObject', {
-            Bucket: this.bucketName,
-            Key: todoId,
-            Expires: this.urlExpiration
-        })
-
-        this.logger.info('url generated', { todoId, bucketName: this.bucketName })
-
-        return uploadUrl
     }
 }
