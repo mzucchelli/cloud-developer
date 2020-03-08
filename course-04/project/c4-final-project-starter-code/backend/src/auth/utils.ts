@@ -11,3 +11,10 @@ export function parseUserId(jwtToken: string): string {
   const decodedJwt = decode(jwtToken) as JwtPayload
   return decodedJwt.sub
 }
+
+export function getUserIdFromHeaders(authorization: string): string {
+  const split = authorization.split(' ')
+  const jwtToken = split[1]
+  const userId = parseUserId(jwtToken)
+  return userId
+}

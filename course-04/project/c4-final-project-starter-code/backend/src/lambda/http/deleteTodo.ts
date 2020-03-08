@@ -1,32 +1,14 @@
 import 'source-map-support/register'
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult, APIGatewayProxyHandler } from 'aws-lambda'
-import * as AWS from 'aws-sdk'
-import { parseUserId } from '../../auth/utils'
-import { createLogger } from '../../utils/logger'
-
-const logger = createLogger('delete-todo')
-const todosTable = process.env.TODOS_TABLE
-const docClient = new AWS.DynamoDB.DocumentClient()
+import { getUserIdFromHeaders } from '../../auth/utils'
+import { deleteTodo } from '../../businessLogic/todos'
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+  const userId = getUserIdFromHeaders(event.headers.Authorization)
   const todoId = event.pathParameters.todoId
-  const authorization = event.headers.Authorization
-  const split = authorization.split(' ')
-  const jwtToken = split[1]
-  const userId = parseUserId(jwtToken)
-
-  logger.info('deleting todo', { todoId });
-
-  await docClient.delete({
-    TableName: todosTable,
-    Key: {
-      todoId,
-      userId
-    }
-  }).promise()
   
-  logger.info('deleted todo', { todoId })
+  await deleteTodo(todoId, userId)
 
   return {
     statusCode: 204,
