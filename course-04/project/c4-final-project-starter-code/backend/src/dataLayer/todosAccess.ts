@@ -1,13 +1,23 @@
 import * as AWS from 'aws-sdk'
+
+// when I import like this, I get an error:
+// Property 'DocumentClient' does not exist on type 'PatchedAWSClientConstructor<ClientConfiguration, typeof DynamoDB>'
+// on the line with new XAWS.DynamoDB.DocumentClient() below
+//import * as AWSXRay from 'aws-xray-sdk'
+
 import { DocumentClient } from 'aws-sdk/clients/dynamodb'
 import { createLogger } from '../utils/logger'
 import { TodoItem } from '../models/TodoItem'
 import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
 
+const AWSXRay = require('aws-xray-sdk');
+const XAWS = AWSXRay.captureAWS(AWS)
+
+
 export class TodoAccess {
     constructor(
         private readonly logger = createLogger('get-todos'),
-        private readonly docClient: DocumentClient = new AWS.DynamoDB.DocumentClient(),
+        private readonly docClient: DocumentClient = new XAWS.DynamoDB.DocumentClient(),
         private readonly todosTable: string = process.env.TODOS_TABLE,
         private readonly indexName: string = process.env.INDEX_NAME,
     ) { }
